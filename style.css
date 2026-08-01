@@ -114,19 +114,15 @@ body {
    ========================== */
 
 section {
-    margin: 2rem 0;
-    padding: 1.5rem;
-
-    background: var(--surface);
-
-    border: 1px solid var(--border);
+    background: rgba(255,255,255,.015);
+    border: 1px solid transparent;
+    box-shadow: none;
     border-radius: var(--radius);
-
-    box-shadow: var(--shadow);
-
+    padding: 2rem 2.5rem;
     transition:
-        background-color var(--transition),
-        border-color var(--transition);
+        background-color 300ms ease,
+        border-color 300ms ease,
+        box-shadow 300ms ease;
 }
 
 section:hover {
