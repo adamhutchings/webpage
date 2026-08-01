@@ -1,14 +1,310 @@
-body {
-    background-color: white;
-    font-family: Helvetica;
-}
-  
-p {
-font-size: 20px;
-max-width: 1000px;
+/* ==========================
+   Modern Dark Theme
+   ========================== */
+
+:root {
+    --bg: #2d2f34;
+    --surface: #383b41;
+    --surface-light: #44484f;
+
+    --border: #565b63;
+
+    --text: #f2f3f5;
+    --text-secondary: #b7bcc7;
+
+    --accent: #5fa8ff;
+    --accent-hover: #7cb9ff;
+
+    --success: #6ccf84;
+    --warning: #f3bf5a;
+    --danger: #e76d6d;
+
+    --radius: 14px;
+    --shadow: 0 8px 24px rgba(0,0,0,.25);
+
+    --transition: 180ms ease;
 }
 
+/* ==========================
+   Base
+   ========================== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    margin: 0;
+    padding: 40px;
+
+    background: var(--bg);
+    color: var(--text);
+
+    font-family:
+        Inter,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    line-height: 1.65;
+}
+
+/* ==========================
+   Typography
+   ========================== */
+
+h1, h2, h3, h4, h5 {
+    margin-top: 0;
+    color: white;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+
+h1 {
+    font-size: 2.4rem;
+}
+
+h2 {
+    margin-bottom: .8rem;
+    padding-bottom: .45rem;
+
+    border-bottom: 1px solid var(--border);
+}
+
+p {
+    color: var(--text-secondary);
+}
+
+ul,
+ol,
 li {
-font-size: 20px;
-max-width: 1000px;   
+    color: var(--text-secondary);
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+    transition: color var(--transition);
+}
+
+a:hover {
+    color: var(--accent-hover);
+}
+
+/* ==========================
+   Main Layout
+   ========================== */
+
+main {
+    max-width: 1000px;
+    margin: auto;
+}
+
+/* ==========================
+   Sections
+   ========================== */
+
+section {
+    margin: 2rem 0;
+    padding: 1.5rem;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow);
+}
+
+/* Optional section hover */
+section:hover {
+    border-color: #6d7380;
+    transition: border-color var(--transition);
+}
+
+/* ==========================
+   Cards
+   ========================== */
+
+.card {
+    background: var(--surface-light);
+
+    border: 1px solid var(--border);
+
+    border-radius: 12px;
+
+    padding: 1rem;
+
+    margin: 1rem 0;
+}
+
+/* ==========================
+   Buttons
+   ========================== */
+
+button,
+.button {
+    background: var(--accent);
+    color: white;
+
+    border: none;
+
+    border-radius: 10px;
+
+    padding: .75rem 1.2rem;
+
+    font-size: 1rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background var(--transition),
+        transform var(--transition);
+}
+
+button:hover,
+.button:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+}
+
+button:active,
+.button:active {
+    transform: translateY(0);
+}
+
+/* ==========================
+   Forms
+   ========================== */
+
+input,
+textarea,
+select {
+    width: 100%;
+
+    padding: .8rem;
+
+    background: #2f3238;
+    color: white;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    font: inherit;
+
+    transition: border-color var(--transition);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+/* ==========================
+   Tables
+   ========================== */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: .8rem;
+    text-align: left;
+}
+
+th {
+    background: var(--surface-light);
+}
+
+tr:nth-child(even) {
+    background: rgba(255,255,255,.03);
+}
+
+/* ==========================
+   Code
+   ========================== */
+
+pre,
+code {
+    font-family:
+        Consolas,
+        "Cascadia Code",
+        monospace;
+}
+
+code {
+    background: rgba(255,255,255,.08);
+    padding: .15rem .4rem;
+    border-radius: 6px;
+}
+
+pre {
+    background: #24262a;
+    padding: 1rem;
+
+    border-radius: 10px;
+
+    overflow-x: auto;
+}
+
+/* ==========================
+   Lists
+   ========================== */
+
+ul,
+ol {
+    padding-left: 1.5rem;
+}
+
+/* ==========================
+   Horizontal Rule
+   ========================== */
+
+hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+}
+
+/* ==========================
+   Images
+   ========================== */
+
+img {
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+/* ==========================
+   Utility Classes
+   ========================== */
+
+.center {
+    text-align: center;
+}
+
+.muted {
+    color: var(--text-secondary);
+}
+
+.accent {
+    color: var(--accent);
+}
+
+.hidden {
+    display: none;
 }
