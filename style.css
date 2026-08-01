@@ -310,3 +310,8 @@ img {
 .hidden {
     display: none;
 }
+
+.pop {
+    color: white;
+    font-weight: bold;
+}
