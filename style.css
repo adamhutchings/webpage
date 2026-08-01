@@ -66,6 +66,7 @@ h1, h2, h3, h4, h5 {
     color: white;
     font-weight: 600;
     letter-spacing: .02em;
+    text-align: center;
 }
 
 h1 {
@@ -103,8 +104,8 @@ a:hover {
    Main Layout
    ========================== */
 
-main {
-    max-width: 1000px;
+body {
+    max-width: 750px;
     margin: auto;
 }
 
@@ -122,12 +123,15 @@ section {
     border-radius: var(--radius);
 
     box-shadow: var(--shadow);
+
+    transition:
+        background-color var(--transition),
+        border-color var(--transition);
 }
 
-/* Optional section hover */
 section:hover {
+    background: var(--surface-light);
     border-color: #6d7380;
-    transition: border-color var(--transition);
 }
 
 /* ==========================
@@ -287,6 +291,8 @@ hr {
 img {
     max-width: 100%;
     border-radius: 10px;
+    display: block;
+    margin: 1.5rem auto;
 }
 
 /* ==========================
