@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+<head>
+    <link rel="stylesheet" href="../style.css">
+    <!-- KaTeX styles -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
+  <!-- KaTeX scripts -->
+  <script defer
+          src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+  <script defer
+          src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body);"></script>
+</head>
+
+<body>
+
+<section>
+    <h1><span class="pop"><a href="cml.html">Machine Learning From Scratch in C</a></span></h2>
+    <h2>August 1, 2026</h3>
+    <p>I tried making a neural network from scratch in C, knowing nothing about how to train it.
+        It actually ended up being a test of my mathematical ability more than anything.
+    </p>
+</section>
+
+<h3><a href="index.html">Back to Blog Posts</a></h3>
+<h3><a href="../index.html">Back to Home</a></h3>
+
+<section>
+<p>This is a post about a past project of mine, which I completed after my freshman
+year of college. As a residential assistant at <a href="https://cty.jhu.edu">a summer camp</a>,
+I would spend all afternoon and evening doing activities with and for the campers.
+After lights-out, I would have a few hours to myself, and I chose to use them to
+learn about neural networks. For some reason, I decided the best way to do this
+would be to build one myself from scratch, in C.</p>
+
+<p>And no cheating by looking up any of the formulas.</p>
+
+<p>(P.S. to understand the math on this page, it is recommended that you know
+    basic calculus, including partial derivatives.)
+</p>
+</section>
+
+<span class="pop">This is quite a long read, and is certainly not the best way to learn about neural
+network training</span>. This is just intended as a way to see how someone could reasonably
+come up with these things on their own, without having to look up formulas. With
+persistence, a lot of things are possible, up to and including deriving backpropagation
+formulas from scratch.
+
+<section>
+<h2>What I Knew (and Didn't Know) Going In</h2>
+<p>
+    I knew going on what a neural network <i>was</i> and how it made a prediction.
+    I will summarize that all here.
+</p>
+<p>
+    A neural network consists of a sequence of <i>layers</i> that the input data
+    is passed through. A "layer" in this case is a particular transformation, and
+    given layers \(L_1 \ldots L_k,\) the output for a given input \(x\) is simply
+    $$L_k(L_{k-1}\ldots L_1(x)).$$
+    Now what is a layer exactly? And for that matter, what sort of input are we
+    getting?
+    <section>
+    <h3>What is a Layer?</h3>
+    <p>The input to a layer comes as a <i>vector</i>, a sequence of \(k\) numbers \(x_1 \ldots x_k,\)
+    and it goes through three steps, to produce a sequence of \(\ell\) numbers \(y_1 \ldots y_\ell.\)</p>
+<ul>
+    <li>
+    First of all, we produce a list of \(\ell\) outputs, which are each a weighted
+    combination of the inputs. Each <i>weight</i> is represented by the letter \(w,\) where
+    \(w_{ij}\) is the contribution of input \(i\) to output \(j\).
+    $$y_1 \leftarrow w_{11}x_1 + w_{21}x_2 + \ldots + w_{k1}x_k,$$
+    $$y_2 \leftarrow w_{12}x_1 + w_{22}x_2 + \ldots + w_{k2}x_k,$$
+    $$\ldots,$$
+    $$y_\ell \leftarrow w_{1\ell}x_1 + w_{2\ell}x_2 + \ldots + w_{k\ell}x_k.$$
+    </li>
+    <li>
+    Next, each output is increased (or decreased!) by a <i>bias</i> term:
+    $$y_1 \leftarrow y_1 + b_1,$$
+    $$y_2 \leftarrow y_2 + b_2,$$
+    $$\ldots,$$
+    $$y_\ell \leftarrow y_\ell + b_\ell.$$
+    </li>
+    <li>
+    Finally, each output is passed through a function \(\sigma\) called the <i>activation function</i>:
+    $$y_1 \leftarrow \sigma(y_1), y_2 \leftarrow \sigma(y_2) \ldots y_\ell \leftarrow \sigma(y_\ell).$$
+    </li>
+</ul>
+So in all, a single layer works like this:
+given an input \(x_1 \ldots x_k,\) the output \(y_1 \ldots y_\ell\) is determined by the formula
+$$\boxed{y_j = \sigma\left(b_j +\sum_{i=1}^k w_{ij}x_i\right).}$$
+</p>
+</section>
+
+<section>
+<h3>How Does a Neural Network Get Trained?</h3>
+<p>
+This was the part I was fuzziest on. I knew that networks were trained by having
+a list of pairs of inputs and outputs for the entire network:
+$$(I_1, E_1), (I_2, E_2), \ldots (I_N, E_N),$$
+where each \(I_i\) was
+a single instance of input data and the output \(E_i\) was what the network was "expected"
+to produce.
+</p>
+
+<p>
+Then, we would do "gradient descent" (wasn't too sure about that) to
+make the network better. What I knew of this is that we would tweak the values of
+the weights \(w_{ij}\) and biases \(b_j\) in each layer to make the output from
+each \(I_i\) hopefully close to the corresponding \(E_i\). Hopefully we have enough
+inputs to "train on" in this sense that if we see a new input, the network produces
+something we "want" to see.
+</p>
+
+<p>
+How to do gradient descent? How we even define "closeness" to the expected output?
+No idea at all. It was something I was going to have to figure out by myself, and
+I did it with a notepad, a piece of paper, and a LaTeX document.
+</p>
+</section>
+</section>
+
+For the record: what I describe from here on out I have had to reconstruct from
+said LaTeX document and the formulas (right or wrong) it contains.
+
+<section>
+<h2>My First Attempt</h2>
+
+<section>
+<h3>Seeing How Loss Changes</h3>
+<p>
+For now, I'm going to represent the entire network as a big function called \(F\).
+So, we have our inputs \(I_1 \ldots I_N\) and we hope that \(F(I_i)\) is close to
+\(O_i\). How do we define "closeness"?
+</p>
+
+<p>
+Well, we can look at the distance away the outputs are from what we expect. I knew
+this sort of thing was called a "loss function". What I had thought to use was this:
+for a single input \(I\), we have both the "expected output" \(E\) and the "actual output"
+\(F(I)\). The distance between them I defined as
+$$\sum_{k=1}^d (E_k - F(I)_k)^2.$$
+Then, the sum of all distances for every input-output pair would be the inaccuracy
+of the entire model, or the "loss".
+$$L = \sum_{i=1}^N L_i,$$
+where \(L_i\) is the loss from the \(i\)-th input-output pair. And our goal was
+to get this as close to zero as possible, where the actual output would match the
+expected output near-perfectly.
+</p>
+
+<p>(I learned later that this was called "mean squared error".)</p>
+
+
+<p>
+Anyway, my first thought was this: for every parameter in the entire network, we
+could change it a little bit and see what would happen to the loss. If we change
+parameter \(p\) by 0.1% and the loss goes down by 0.5%, then we would expect that
+(at least for very small increments), if we change \(p\) by 0.2% then the loss
+will decrease by 1%. Double the input, double the output. Then, once we knew how
+much changing each parameter would affect the network, we would move all of the
+parameters in the direction that made the loss better. So, if increasing \(p_1\) made
+the loss a little better (smaller), increasing \(p_2\) made the loss a lot worse
+(larger), and increasing \(p_3\) didn't change it much at all, then we should increase
+\(p_1\) a little bit, <i>decrease</i> \(p_2\) a lot, and not do anything to \(p_3\).
+</p>
+
+<p>
+Formulaically, if the parameter \(p\) has value \(\hat p\), then we compute \(L\)
+the current loss and \(L_{new}\) the loss with \(\hat p\) increased by a small increment
+\(\delta\), and set
+$$\hat p \leftarrow \hat p - \varepsilon \frac{L - L_{new}}{\delta}.$$
+</p>
+</section>
+
+<section>
+<h3>Did This Work?</h3>
+<p>
+When I tried this on a small dataset (with the input dimension being size 4), it
+definitely did work. This told me my strategy was a good idea: seeing how changing
+a parameter affected the loss, and then tweaking it in a way that made the loss
+go down. Emboldened by my success, I eagerly tried it on a much larger dataset:
+the MNIST dataset, where each input had 784 entries and the output was to have 10
+components. I pressed "run" ... and it hung forever.
+</p>
+
+<p>
+What?? Why is nothing happening?
+</p>
+
+<p>
+The answer, simply put, is that this is simply too slow. Each gradient computation
+requires evaluating the entire neural network (to find \(L_{new}\) for changing
+a given parameter). If we have \(N\) training examples, \(k\) inputs and \(\ell\)
+outputs, then under reasonable assumptions we have at least \(k\ell\) parameters.
+So, each run of the model once takes at least \(k\ell\) operations, each gradient
+computation runs \(N\) of these runs to compute the new loss, and we do this for
+each parameter.
+</p>
+
+<p>
+That's \(Nk^2\ell^2\)
+operations. For a <i>single layer</i>. For the dataset I was using, we had
+$$N \sim 4 \cdot 10^4, k \sim 800, \ell \sim 32 \rightarrow \boxed{2.5 \cdot 10^{13}} \:\text{operations}.$$
+With unoptimized C, and on my Macbook, that's at least 2 minutes per step.
+</p>
+
+</section>
+
+<section>
+<h3>Can This Be Faster?</h3>
+I thought about what exactly we were trying to do with changing a parameter slightly.
+In essence, if \(L_p(\hat p)\) is the loss when parameter \(p\) has value \(\hat p\),
+then our update is of the form
+$$p \leftarrow p + \varepsilon \cdot \frac{L_p(\hat p) - L_p(\hat p + \delta)}{\delta}.$$
+Written in a slightly more familiar form, this is
+$$p \leftarrow p - \varepsilon \cdot \frac{L_p(\hat p + \delta) - L_p(\hat p)}{\delta}.$$
+The second term might look familiar to those who know calculus well: if we take the limit as \(\delta \rightarrow 0\), this is
+$$p \leftarrow p - \varepsilon {L_p}'(\hat p).$$
+Is this any better? Can we even take a derivative like this in a way that is
+useful? What are the advantages of this? There are two that immediately pop out:
+<ul>
+    <li>
+        We are getting the <i>exact</i>value that the loss will change by at the
+        point, not a lossy approximation and dividing one small number by another
+        very small number.
+    </li>
+    <li>
+        Because of the chain rule, it turns out that we can heavily reuse calculations.
+    </li>
+</ul>
+</section>
+
+</section>
+
+<section>
+<h2>My Second Attempt</h2>
+
+<section>
+<h3>Notation and Formulas</h3>
+<p>
+Here's what I wrote out exactly, but for changing the names of the letters:
+<ul>
+    <li>The neural network has \(q\) layers. The \(k\)th layer has input size
+        \(d_{k-1}\) and output size \(d_k\). Note that this means the entire network
+        accepts a vector of length \(d_0\) and outputs one of length \(d_q\).
+    </li>
+    <li>The weights of the \(k\)th layer are called \(w_{k,ij}\) and the biases
+        are called \(b_{k,j}\).
+    </li>
+    <li>The output of the \(k\)th layer is denoted as the vector \(D_k\). This is 
+        of length \(d_k\), so its entries run from \(D_{k,0}\) to \(D_{k,d_k}\).
+    </li>
+    <li>The output of the \(k\)th layer <i>before being passed through the final
+        activation function</i> is called \(\hat D_k\).</li>
+    <li>
+        The overall loss (from a single input-output pair) is called \(L\).
+    </li>
+</ul>
+Then, we can rewrite the formulas as follows: for each input-expected output pair \((I, E)\),
+we have the following. Because the input is the input to the first layer,
+$$D_{0,i} = I_i.$$
+Because the output of a layer before the activation function is given by a matrix multiplication,
+$$\hat D_{k,j} = b_{k,j} + \sum_{i=1}^{d_{k-1}} w_{k,ij} D_{{k-1},i}.$$
+The final activation in a layer gives us
+$$D_{k,j} = \sigma(\hat D_{k,j}).$$
+The actual output is just the last layer:
+$$O_j = D_{q,j},$$
+and the loss is
+$$L = \sum_{j=1}^{d_q} (D_{q,j} - E_j)^2.$$
+Now, our humble task is this: given any parameter \(p\), a weight or bias in any
+layer at all, compute
+$$\frac{\partial L}{\partial p}.$$
+</p>
+</section>
+
+<section>
+<h3>The Calculation.</h3>
+<p>
+This basically comes down to using the chain rule over and over and over again.
+Because of the formula
+$$L = \sum_{j=1}^{d_q} (D_{q,j} - E_j)^2,$$
+and \(E\) is a constant expected output,
+$$\frac{\partial L}{\partial p} = \sum_{j=1}^{d_q} 2(D_{q,j} - E_j) \cdot \frac{\partial D_{q,j}}{\partial p}.$$
+So now it comes down to calculating the partial derivatives of the last layer output, the actual output we called \(O\).
+Because \(D_{q,j} = \sigma(\hat D_{q,j})\), we have
+$$\frac{\partial D_{q,j}}{\partial p} = \sigma'(\hat D_{q,j}) \cdot \frac{\partial \hat D_{q,j}}{\partial p}.$$
+What do we do from here?
+</p>
+</section>
+<section>
+<h3>The Last Layer</h3>
+<p>
+I decided to start with the last layer. Remember that
+$$\hat D_{q,j} = b_{q,j} + \sum_{i=1}^{d_{q-1}} w_{q,ij} D_{{q-1},i},$$
+and all of the last layer parameters appear here!
+</p>
+<p>
+First, the bias is very easy! The \(j\)th bias entry only affects the \(j\)th
+pre-activation output and nothing else. We use \(\delta_{x,y}\) to indicate a
+variable which is 1 if \(x=y\) and 0 otherwise, so
+$$\frac{\partial \hat D_{q,j}}{\partial b_{j'}} = \delta_{j,j'}.$$
+Next, the weights are almost as easy. Similarly, a weight \(w_{q,ij}\) only affects
+the \(j\)th output, so we get:
+$$\frac{\partial \hat D_{q,j}}{\partial w_{q,ij'}} = \delta_{j,j'} D_{{q-1},i}.$$
+</p>
+<p>
+The key realization I made at this point is that this is recursive: if a parameter
+is not in this layer, it instead affects <i>every output from the previous layer</i>, so
+we can use the chain rule: if \(p\) is some other parameter,
+$$\frac{\partial \hat D_{q,j}}{\partial p} = \sum_{i=1}^{d_{q-1}} w_{q,ij} \frac{\partial D_{{q-1},j}}{\partial p}.$$
+And well, we already know how to do that: we just do induction. If a parameter is in the same
+layer, we use one of the two simple formulas, and if not, we recurse backwards.
+</p>
+</section>
+</section>
+
+<section>
+<h2>How Did I Implement This?</h2>
+<p>
+It turns out that C was maybe the worst possible language to do this in. Storing the
+matrices of partial derivatives required managing huge multidimensional arrays which
+constantly got rewritten and referenced. Not conceptually difficult per se, but extremely
+error-prone.
+</p>
+<p>
+The amount of parallelization I did was also zero, so it would have been safer,
+easier, <i>and</i> faster in Python.
+</p>
+</section>
+
+<section>
+<h2>Other Optimizations?</h2>
+<p>
+If you just go down by the gradient every time, it's like walking down a hill by
+looking at where "downhill" happens to be and going there. However, maybe you end
+up in a shallow bowl where something much lower is over the horizon.
+</p>
+<p>
+What I'm saying is that I ended up writing my own optimizer from scratch.
+</p>
+<p>I still remember one valuable technique: imagine it's a ball rolling down a
+    hill. If on the \(t\)th step we update the parameter \(p\) by quantity
+    \(p_t\), then instead of doing the gradient step
+    $$p_t = \varepsilon \frac{\partial L}{\partial p},$$
+    $$\hat p \rightarrow \hat p - \varepsilon p_t,$$
+    we preserve part of the last step:
+    $$p_t = \alpha \varepsilon \frac{\partial L}{\partial p} + (1-\alpha)p_{t-1}.$$
+    That way, if we stop moving very suddenly, we still take a large amount of the
+    last step (maybe like 80%!) and only do 20% "worth" of the new gradient.
+</p>
+<p>
+I had a bunch of other complicated backtracking things I used to find the best
+point, but that one in particular really stuck with me.
+</p>
+<p>
+I also did batching: instead of finding the loss on all 40,000 training samples,
+I would choose a small subset of them at random (only a few hundreds) to estimate
+the gradient from. This sped up performance by 100x.
+</p>
+</section>
+
+<section>
+<h2>How Did It Perform?</h2>
+The dataset in question is called MNIST. The 784-dimensional input is actually a
+pixelated map, 28x28 of pixels of a handwritten digit, and the task is to
+identify the digit zero through nine. Chance accuracy is 10%, and this model
+actually got up to around 80%!
+</section>
+
+<section>
+<h2>Conclusion</h2>
+
+<p>
+Compared to other methods, this was very laborious, quite slow, and very hard to
+figure out. However, I learned something valuable which is nigh impossible to get
+in any other way.
+</p>
+After this project, I understood <i>exactly</i> how gradient descent worked.
+
+<p>
+And that's not a joke: knowing how something works on a deep intuitive level is
+important. I'm sure the eyes of many a reader would glaze over reading this math
+(I don't blame you for a second, I would do the same myself), but I really
+understood every single line I wrote when I had to figure it all out.
+</p>
+<p>
+And I was ready when I got an exam question asking us to do this by hand. Which
+I have surprisingly had happen in two different classes.
+</p>
+</section>
+
+</body>
+</html>
