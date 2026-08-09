@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+<head>
+    <link rel="stylesheet" href="../style.css">
+    <!-- KaTeX styles -->
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+
+  <!-- KaTeX scripts -->
+  <script defer
+          src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+  <script defer
+          src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body);"></script>
+</head>
+
+<body>
+
+<section>
+    <h1><span class="pop"><a href="cml.html">Labeling Family Trees</a></span></h2>
+    <h2>August 9, 2026</h3>
+    <p>An innocent question about labeling chromosome data turned out to be a
+        surprisingly instructive algorithms problem. It is the problem I've seen which
+        uses the most areas of basic algorithms simultaneously, without
+        requiring any particularly specialized knowledge.
+    </p>
+</section>
+
+<h3><a href="index.html">Back to Blog Posts</a></h3>
+<h3><a href="../index.html">Back to Home</a></h3>
+
+<h2>The Problem Motivation</h2>
+
+<section>
+<h3>Humanity's Two Family Trees</h3>
+<p>
+    From the perspective of a computer scientist, the term "family tree" is very
+    misleading. Everyone has two genetic parents, and many people have more than
+    one genetic descendant, so the graph of human genetic relations is very far
+    from being a tree.
+</p>
+<p>
+    This means, in more pedestrian terms, that no human has a single "heritage".
+    Even if both of your parents hail from the same place, you (probably) have 
+    four distinct grandparents, eight great-grandparents, and so forth. While
+    people do marry their very distant relatives so the number of ancestors does
+    not keep doubling forever and ever, the average person of European descent
+    might have somewhere around one million ancestors who were alive in the year
+    1500. The chances of each of those people being from the same place, even
+    from Europe as a whole, is near zero.
+</p>
+<p>
+    It turns out that the graph of humanity can in fact be made into a tree. While 
+    each person inherits half of their DNA from each biological parent, there are
+    two regions of the genome which are inherited from one parent only. If we look
+    at mitochondrial DNA, which is inherited only from the mother, suddenly the
+    dazzling complexity of the human family tree is eliminated almost entirely.
+    Each person has exactly one mitochondrial parent (their mother), so it is
+    possible to create a maternal-ancestry tree back to the dawn of humanity.
+</p>
+<p>
+    Similarly, every biological male inherits their Y chromosome only from their
+    father, so considering only father-to-son inheritance, we arrive at a second
+    family tree of humanity, a <i>paternal-</i>-ancestry tree stretching back
+    hundreds of thousands of years. In this way, everyone alive actually finds
+    their place in <i>two</i> family trees. And these are trees that computer
+    scientists can finally be happy with.
+</p>
+</section>
+
+<section>
+<h3>How to Label a Tree?</h3>
+<p>
+    These two family trees, while finally proper trees in the mathematical sense,
+    are still incredibly vast -- both trees have tens of thousands of boughs, little
+    clusters of humanity united by common maternal or paternal descent. Researchers
+    therefore have selected some large branches of each tree, called "haplogroups",
+    and given them names.
+    For example, paternal haplogroup D mostly contains men native to Tibet and
+    Japan, and a few scattered in some other locations like West Africa and the
+    Andaman islands.
+<figure>
+<img src="../images/haplogroupd.png" height="300">
+<figcaption>Credit: Wikipedia</figcaption>
+</figure>
+    By contrast, maternal haplogroup H is much more widespread,
+    occurring in roughly 40% of people from most European-derived populations.
+<figure>
+<img src="../images/haplogrouph.png" height="300">
+<figcaption>Credit: Mathilda's Anthropology Blog</figcaption>
+</figure>
+</p>
+<p>
+    Subgroups are given by appending numbers and letters to the initial name in
+    an alternating pattern. For instance, maternal haplogroup U has subgroups
+    U1 through U9, U1 itself has subclades U1a and U1b, and so forth. One
+    particular paternal haplogroup, common in Western European men, is designated
+    haplogroup R1b1a1b1a1a.
+</p>
+<p>
+    However, the history of human population expansions means that nodes on the
+    tree are of vastly different sizes. This is especially the case in the
+    paternal tree, because throughout history, successful men have sired huge
+    numbers of children. Haplogroup B, originating in the first humans to settle
+    the central African rainforest, is common today in parts of Africa and occurs
+    in a few percent of African-American men for a total of a few million people
+    worldwide.
+<figure>
+<img src="../images/haplogroupb.png" height="300">
+<figcaption>Credit: Wikipedia</figcaption>
+</figure>
+    By contrast, paternal haplogroup R happened to include the first
+    people to domesticate the horse and spread chariot technologies across
+    Eurasia, so today it includes the majority of men in North America, Europe,
+    and South Asia for a total of roughly one billion living males.
+
+<figure>
+<div class="gallery-wrapper">
+    <img src="../images/haplogroupr1a.png" alt="One major branch of haplogroup R" height="150">
+    <img src="../images/haplogroupr1b.png" alt="Another major branch of haplogroup R" height="175">
+  </div>
+<figcaption>Two large branches of haplogroup R. Credit: Wikipedia</figcaption>
+</figure>
+</p>
+<p>
+    While learning about this, I began to think: if we could start over, how
+    could we label the tree most fairly? Today, haplogroups R and O together
+    contain about half of living males. The rest of them, haplogroups A through 
+    T, together complete for the other half. What would be the most fair
+    labeling possible? And is there a way to determine it algorithmically?
+</p>
+</section>
+
+<h2>The Problem Statement</h2>
+<section>
+<p>
+    You are given a rooted tree of N nodes where every leaf node has a weight.
+    (Imagine this as one of humanity's two trees, where each leaf node is a cluster
+    of people sharing a similar Y chromosome or mitochondrial DNA sequence.)
+<figure>
+<img src="../images/smalltree.png" height="200">
+<figcaption>A small example tree</figcaption>
+</figure>
+    You are allowed to label some nodes. Then, the "weight" of a label is the
+    total sum of weights of all descendant nodes. For example in the above diagram,
+    if we label node X1, then its weight is 250.
+</p>
+<p>
+    Suppose we have two labels: X1 with weight 250, and X2b with weight 100. Then
+    the weight of the "miscellaneous" nodes (that is, just X2a left over) is only
+    50. These represent the people who don't fit into any named group.
+<figure>
+<img src="../images/smallcoloredtree.png" height="200">
+<figcaption>X1 is red, X2b is yellow, and miscellaneous is uncolored.</figcaption>
+</figure>
+</p>
+<p>
+If we have \(k\) labels, none of which is a descendant of any other, then we have
+\(k+1\) group sizes \(w_1 \ldots w_k\): the number of descendants of each label, and then a
+"leftover" bucket size \(x\). In this example, we have \(k=2\) and \(w_1=250,w_2=100,x=50\).
+Here, the largest bucket size is 250. However, here is an alternate placement with
+\(k=2\) where the largest bucket size is only 150:
+<figure>
+<img src="../images/smalloptimalcolor.png" height="200">
+<figcaption>Now, \(w_1=100,w_2=150,x=150\).</figcaption>
+</figure>
+</p>
+<p>
+So the question becomes: given a tree and a number \(k\) of labels we are allowed
+to use, can we determine an optimal configuration of labels which gives us the
+smallest maximum bucket size?
+</p>
+</section>
+
+</body>
+</html>
