@@ -180,5 +180,26 @@ smallest maximum bucket size?
 </p>
 </section>
 
+<p>
+Stop here if you want to think of the solution by yourself. Otherwise, it will
+be discussed below.
+</p>
+
+<h2>The Solution</h2>
+<section>
+<p>
+    We have a tree with \(N\) nodes total. Each leaf node has an integer weight,
+    from 0 to a maximum \(M\). We are granted \(k\) labels which we can use. How
+    quickly can we determine
+    $$\min_{\text{all label placements}} \max(w_1 \ldots w_k, x)?$$
+    Let's check one thing real quick: even assuming precomputing the weight of
+    each label (which is not an unreasonable assumption), the brute force
+    strategy requires checking \({N \choose k}\) label combinations. We can
+    approximate this by
+    $${N \choose k} = \frac{N!}{k!(N-k)!},$$
+    which grows exponentially with \(N\). We have to be able to do better.
+</p>
+</section>
+
 </body>
 </html>
